@@ -3,7 +3,7 @@ import cv2
 import math 
 
 def process_text(text):
-    keywords = ["banana", "apple", "cell phone", "cup", "bottle"]  # Note: "cell phone" instead of "cellphone"
+    keywords = ["banana", "apple", "cell phone", "cup", "bottle"] 
     detected_keywords = [keyword for keyword in keywords if keyword in text]
     return detected_keywords
 
@@ -25,6 +25,8 @@ def listen_for_keyword():
 
 def plot_box(results, img, target_classes, classNames):
     # coordinates
+    center_x = 0
+    center_y = 0
     for r in results:
         boxes = r.boxes
 
@@ -34,10 +36,11 @@ def plot_box(results, img, target_classes, classNames):
                 # bounding box
                 x1, y1, x2, y2 = box.xyxy[0]
                 x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2) # convert to int values
-
+                center_x = math.floor((x2+x1)/2)
+                center_y = math.floor((y2+y1)/2)
                 # put box in cam
                 cv2.rectangle(img, (x1, y1), (x2, y2), (255, 0, 255), 3)
-
+                cv2.circle(img,(center_x,center_y),10,(0,0,255),10)
                 # confidence
                 confidence = math.ceil((box.conf[0]*100))/100
                 print("Confidence --->",confidence)
@@ -53,4 +56,4 @@ def plot_box(results, img, target_classes, classNames):
                 thickness = 2
 
                 cv2.putText(img, classNames[cls], org, font, fontScale, color, thickness)
-            return img
+            return img, center_x, center_y

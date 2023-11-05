@@ -10,7 +10,7 @@ cap = cv2.VideoCapture(0)
 cap.set(3, 640)
 cap.set(4, 480)
 
-# model
+# initialize model
 model = YOLO("yolo-Weights/yolov8n.pt")
 
 # object classes
@@ -26,24 +26,30 @@ classNames = ["person", "bicycle", "car", "motorbike", "aeroplane", "bus", "trai
               "teddy bear", "hair drier", "toothbrush"
               ]  
 
-# Define the classes you want to detect
+# initialize variables 
 target_classes = [  ]
 detected_text = []
+
 while True:
+    # only listens when space is pressed
     if keyboard.is_pressed("space"):
         detected_text = Func_Artificial_eye.listen_for_keyword()
 
     if detected_text is not None:
         print(f"Detected: {detected_text}")
+        # if you want to listen to other keywords, change them in process_text
         target_classes = Func_Artificial_eye.process_text (detected_text)
 
         if target_classes:
             print(f"Detected keywords: {', '.join(target_classes)}")
 
+    # object detection 
     success, img = cap.read()
     results = model(img, stream=True);
 
-    img = Func_Artificial_eye.plot_box(results,img,target_classes,classNames)
+    # plot boxes around object
+    # coordinates of detected oject
+    img, center_x, center_y = Func_Artificial_eye.plot_box(results,img,target_classes,classNames)   #  runs into error if no objects are detected --> check if results it not empty
 
     cv2.imshow('Webcam', img)
     if cv2.waitKey(1) == ord('q'):
